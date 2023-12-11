@@ -1,4 +1,4 @@
-const { HttpErrors } = require("../helpers/HttpErrors");
+const { HttpErrors } = require("../../helpers");
 
 const notValidBody = (req, res, next) => {
   const body = req.body;

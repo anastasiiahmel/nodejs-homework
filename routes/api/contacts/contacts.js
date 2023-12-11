@@ -1,13 +1,16 @@
 const express = require("express");
 const router = express.Router();
 
-const controllers = require("..//../controllers/index");
+const controllers = require("../../../controllers");
 
-const { validateCode } = require("../../middlewares/validateBody");
-const isValidId = require("../../middlewares/isValidId");
-const notValidBody = require("../../middlewares/notValidBody");
+const {
+  validateCode,
+  isValidId,
+  notValidBody,
+} = require("../../../middlewares");
 
-const verificationData = require("..//../schemas/contacts");
+
+const verificationData = require("../../../schemas");
 
 router.get("/", controllers.getAll);
 
