@@ -14,8 +14,8 @@ const schemaReg = Joi.object({
 });
 
 const schemaLog = Joi.object({
-  email: Joi.string(),
-  password: Joi.string().min(6),
+  email: Joi.string().required(),
+  password: Joi.string().min(6).required(),
 });
 
 const schemaForUser = new Schema(

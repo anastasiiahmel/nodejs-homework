@@ -1,9 +1,11 @@
 const { HttpErrors, controlErrors } = require("../../helpers");
 
-const { Contact } = require("../../schemas/contacts/contacts");
+const { Contact } = require("../../schemas");
 
 const getAll = async (req, res) => {
-  const result = await Contact.find({}, "-createdAt -updatedAt");
+  const { id: owner } = req.user;
+  const result = await Contact.find({ owner }, "-createdAt -updatedAt");
+
   res.json(result);
 };
 
@@ -17,7 +19,8 @@ const getById = async (req, res) => {
 };
 
 const getAdd = async (req, res) => {
-  const resultAdd = await Contact.create(req.body);
+  const { _id: owner } = req.user;
+  const resultAdd = await Contact.create({ ...req.body, owner });
   res.status(201).json(resultAdd);
 };
 

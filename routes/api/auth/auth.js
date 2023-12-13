@@ -3,9 +3,11 @@ const router = express.Router();
 
 const controllers = require("../../../controllers");
 
-const { validateCode } = require("../../../middlewares");
+const { validateCode, authorization } = require("../../../middlewares");
 
 const schemaUsers = require("../../../schemas");
+
+router.get("/current", authorization, controllers.getCurrent);
 
 router.post(
   "/register",
@@ -18,5 +20,7 @@ router.post(
   validateCode(schemaUsers.schemaLog),
   controllers.getLogin
 );
+
+router.post("/logout", authorization, controllers.getLogOut);
 
 module.exports = router;

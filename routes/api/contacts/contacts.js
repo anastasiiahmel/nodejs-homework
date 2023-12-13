@@ -7,21 +7,27 @@ const {
   validateCode,
   isValidId,
   notValidBody,
+  authorization,
 } = require("../../../middlewares");
-
 
 const verificationData = require("../../../schemas");
 
-router.get("/", controllers.getAll);
+router.get("/", authorization, controllers.getAll);
 
-router.get("/:contactId", controllers.getById);
+router.get("/:contactId", authorization, controllers.getById);
 
-router.post("/", validateCode(verificationData.schemaJoi), controllers.getAdd);
+router.post(
+  "/",
+  authorization,
+  validateCode(verificationData.schemaJoi),
+  controllers.getAdd
+);
 
-router.delete("/:contactId", isValidId, controllers.getDelete);
+router.delete("/:contactId", authorization, isValidId, controllers.getDelete);
 
 router.put(
   "/:contactId",
+  authorization,
   isValidId,
   validateCode(verificationData.schemaJoi),
   controllers.getUpdate
@@ -29,6 +35,7 @@ router.put(
 
 router.patch(
   "/:contactId/favorite",
+  authorization,
   notValidBody,
   isValidId,
   validateCode(verificationData.favoriteSchema),
