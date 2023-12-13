@@ -4,15 +4,25 @@ const { Schema, model } = require("mongoose");
 const { errorMongoose } = require("../../helpers/errorMongoose/errorMongoose");
 
 const schemaReg = Joi.object({
-  name: Joi.string().min(3).max(30),
-  email: Joi.string().required(),
+  email: Joi.string()
+    .email({
+      minDomainSegments: 2,
+      tlds: { allow: ["com", "net", "uk"] },
+    })
+    .required(),
   password: Joi.string().min(6).required(),
+});
+
+const schemaLog = Joi.object({
+  email: Joi.string(),
+  password: Joi.string().min(6),
 });
 
 const schemaForUser = new Schema(
   {
     password: {
       type: String,
+      minlength: 6,
       required: [true, "Set password for user"],
     },
     email: {
@@ -25,6 +35,7 @@ const schemaForUser = new Schema(
       enum: ["starter", "pro", "business"],
       default: "starter",
     },
+    token: String,
   },
   { versionKey: false, timestamps: true }
 );
@@ -33,4 +44,4 @@ schemaForUser.post("save", errorMongoose);
 
 const User = model("user", schemaForUser);
 
-module.exports = { User, schemaReg };
+module.exports = { User, schemaReg, schemaLog };

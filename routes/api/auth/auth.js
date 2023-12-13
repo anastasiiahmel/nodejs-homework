@@ -13,4 +13,10 @@ router.post(
   controllers.getRegister
 );
 
+router.post(
+  "/login",
+  validateCode(schemaUsers.schemaLog),
+  controllers.getLogin
+);
+
 module.exports = router;
