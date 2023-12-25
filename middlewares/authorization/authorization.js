@@ -8,7 +8,6 @@ const { HttpErrors } = require("../../helpers");
 
 const authorization = async (req, res, next) => {
   const { authorization = "" } = req.headers;
-  console.log("authorization :>> ", authorization);
   const [bearer, token] = authorization.split(" ");
   if (bearer !== "Bearer") {
     next(HttpErrors(401, "Not authorized!"));

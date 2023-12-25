@@ -4,11 +4,13 @@ const path = require("path");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const gravatar = require("gravatar");
+const fs = require("fs/promises");
+const Jimp = require("jimp");
 
 const { controlErrors, HttpErrors } = require("../../helpers");
 const { User } = require("../../schemas");
 
-// const avatarsDir = path.join(__dirname, "../", "../", "public", "avatars");
+const avatarsDir = path.join(__dirname, "../", "../", "public", "avatars");
 
 const getRegister = async (req, res) => {
   const { email, password } = req.body;
@@ -48,7 +50,7 @@ const getLogin = async (req, res) => {
     id: user._id,
   };
 
-  const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "23h" });
+  const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "1h" });
 
   await User.findByIdAndUpdate(user._id, { token });
 
@@ -75,9 +77,32 @@ const getLogOut = async (req, res) => {
   res.status(204).json();
 };
 
+const getUpdateAvatar = async (req, res) => {
+  const { _id } = req.user;
+  if (!req.file) {
+    throw HttpErrors(400, "File not found !");
+  }
+  const { path: tempUpload, originalname } = req.file;
+  const filename = `${_id}_${originalname}`;
+
+  const resultUpload = path.join(avatarsDir, filename);
+
+  const avatarURL = path.join("avatars", filename);
+  await fs.rename(tempUpload, resultUpload);
+  await User.findByIdAndUpdate(_id, { avatarURL });
+
+  Jimp.read(`${avatarsDir}/${filename}`, (err, fileAvatar) => {
+    if (err) throw err;
+    fileAvatar.cover(250, 250).write(`${avatarsDir}/${filename}`);
+  });
+
+  res.json({ avatarURL });
+};
+
 module.exports = {
   getRegister: controlErrors(getRegister),
   getLogin: controlErrors(getLogin),
   getCurrent: controlErrors(getCurrent),
   getLogOut: controlErrors(getLogOut),
+  getUpdateAvatar: controlErrors(getUpdateAvatar),
 };
