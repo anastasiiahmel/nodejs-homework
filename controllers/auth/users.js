@@ -1,14 +1,19 @@
 const { SECRET_KEY } = process.env;
 
+const path = require("path");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const gravatar = require("gravatar");
+
 const { controlErrors, HttpErrors } = require("../../helpers");
 const { User } = require("../../schemas");
 
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+// const avatarsDir = path.join(__dirname, "../", "../", "public", "avatars");
 
 const getRegister = async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
+  const avatarURL = gravatar.url(email);
   console.log(user);
 
   if (user) {
@@ -18,6 +23,7 @@ const getRegister = async (req, res) => {
   const newUser = await User.create({
     ...req.body,
     password: hashedPassword,
+    avatarURL,
   });
   res.status(201).json({
     user: {
