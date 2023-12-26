@@ -1,4 +1,4 @@
-const { SECRET_KEY } = process.env;
+const { SECRET_KEY, BASE_URL } = process.env;
 
 const path = require("path");
 const bcrypt = require("bcryptjs");
@@ -6,17 +6,26 @@ const jwt = require("jsonwebtoken");
 const gravatar = require("gravatar");
 const fs = require("fs/promises");
 const Jimp = require("jimp");
+const nodemailer = require("nodemailer");
+const { nanoid } = require("nanoid");
 
-const { controlErrors, HttpErrors } = require("../../helpers");
+const {
+  controlErrors,
+  HttpErrors,
+  nodemailerConfig,
+} = require("../../helpers");
 const { User } = require("../../schemas");
 
 const avatarsDir = path.join(__dirname, "../", "../", "public", "avatars");
+
+const transport = nodemailer.createTransport(nodemailerConfig);
 
 const getRegister = async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
   const avatarURL = gravatar.url(email);
-  console.log(user);
+
+  const verificationToken = nanoid();
 
   if (user) {
     throw HttpErrors(409, "Email in use!");
@@ -26,7 +35,16 @@ const getRegister = async (req, res) => {
     ...req.body,
     password: hashedPassword,
     avatarURL,
+    verificationToken,
   });
+
+  const verifyEmail = {
+    to: email,
+    subject: "Verify email",
+    html: `<a target="_blank" href="${BASE_URL}/users/verify/${verificationToken}">Click verify email</a>`,
+  };
+  await transport.sendMail(verifyEmail);
+
   res.status(201).json({
     user: {
       email: newUser.email,
