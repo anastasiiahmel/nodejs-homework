@@ -40,7 +40,8 @@ const getRegister = async (req, res) => {
 
   const verifyEmail = {
     to: email,
-    subject: "Verify email",
+    from: "khmel.anastas@meta.ua",
+    subject: "Test email",
     html: `<a target="_blank" href="${BASE_URL}/users/verify/${verificationToken}">Click verify email</a>`,
   };
   await transport.sendMail(verifyEmail);
@@ -50,6 +51,43 @@ const getRegister = async (req, res) => {
       email: newUser.email,
       subscription: newUser.subscription,
     },
+  });
+};
+
+const verifyEmail = async (req, res) => {
+  const { verificationToken } = req.params;
+  const user = await User.findOne({ verificationToken });
+  if (!user) {
+    throw HttpErrors(404, "User not found");
+  }
+  await User.findByIdAndUpdate(user._id, {
+    verify: true,
+    verificationToken: "",
+  });
+  res.status(200).json({
+    message: "Email verify  success!",
+  });
+};
+
+const resendEmail = async (req, res) => {
+  const { email } = req.body;
+  const result = await User.findOne({ email });
+  if (!result) {
+    throw HttpErrors(400, "Email not found!");
+  }
+  if (result.verify) {
+    throw HttpErrors(400, "Email already verify!");
+  }
+  const verifyEmail = {
+    to: email,
+    from: "khmel.anastas@meta.ua",
+    subject: "Verify email",
+    Html: `<a target = "_blank" href="${BASE_URL}/users/verify/${result.verificationToken}">Click verify email</a>`,
+  };
+
+  await transport.sendMail(verifyEmail);
+  res.status(200).json({
+    message: "Verify email send success!",
   });
 };
 
@@ -123,4 +161,6 @@ module.exports = {
   getCurrent: controlErrors(getCurrent),
   getLogOut: controlErrors(getLogOut),
   getUpdateAvatar: controlErrors(getUpdateAvatar),
+  verifyEmail: controlErrors(verifyEmail),
+  resendEmail: controlErrors(resendEmail),
 };

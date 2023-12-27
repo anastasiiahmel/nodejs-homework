@@ -1,4 +1,4 @@
-const { User, schemaReg, schemaLog } = require("./users/users");
+const { User, schemaReg, schemaLog, emailSchema } = require("./users/users");
 
 const { Contact, schemaJoi, favoriteSchema } = require("./contacts/contacts");
 
@@ -9,4 +9,5 @@ module.exports = {
   User,
   schemaReg,
   schemaLog,
+  emailSchema,
 };

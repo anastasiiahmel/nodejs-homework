@@ -9,10 +9,17 @@ const schemaUsers = require("../../../schemas");
 
 router.get("/current", authorization, controllers.getCurrent);
 
+router.get("/verify/:verificationToken", controllers.verifyEmail);
 router.post(
   "/register",
   validateCode(schemaUsers.schemaReg),
   controllers.getRegister
+);
+
+router.post(
+  "/verify",
+  validateCode(schemaUsers.emailSchema),
+  controllers.resendEmail
 );
 
 router.post(

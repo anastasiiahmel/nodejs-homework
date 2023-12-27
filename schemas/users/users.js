@@ -13,6 +13,10 @@ const schemaReg = Joi.object({
   password: Joi.string().min(6).required(),
 });
 
+const emailSchema = Joi.object({
+  email: Joi.string().required(),
+});
+
 const schemaLog = Joi.object({
   email: Joi.string().required(),
   password: Joi.string().min(6).required(),
@@ -54,4 +58,4 @@ schemaForUser.post("save", errorMongoose);
 
 const User = model("user", schemaForUser);
 
-module.exports = { User, schemaReg, schemaLog };
+module.exports = { User, schemaReg, schemaLog, emailSchema };
